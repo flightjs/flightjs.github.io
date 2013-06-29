@@ -1,4 +1,3 @@
-###tests for demo app
-[![Build Status](https://travis-ci.org/twitter/flight.png?branch=gh-pages)](http://travis-ci.org/twitter/flight)
+# Flight website
 
-[Full README](https://github.com/twitter/flight/blob/master/README.md)
+The source code of the website for Twitter's JavaScript framework, Flight.
