@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Flight by Twitter</title>
+    <meta name="description" content="A lightweight, component-based JavaScript framework for assigning behavior to DOM nodes.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="http://twitter.com/favicons/favicon.ico">
+    <link rel="stylesheet" href="css/normalize.min.css">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-39101739-3', 'flightjs.github.io');
+  ga('send', 'pageview');
+</script>
+<body>
+      <div class="container">
+
+      <div class="site-header" role="banner">
+        <img src="img/flight-logo.png" width="150" height="150" alt="Twitter logo">
+        <h1>Getting started with Flight</h1>
+      </div><!-- /.site-header -->
+
+      <div class="site-main" role="main">
+
+        <p>This tutorial will cover all of the necessary steps to start building web applications with Flight. </p>
+
+        <h1>Prerequisites</h1>
+
+        <ul>
+        <li>Make sure Node.JS and npm are installed on your machine [download installers here]</li>
+        <li>Make sure Bower is installed globally via npm [instructions here]</li>
+        </ul>
+
+        <h1>Installation</h1>
+
+        <p>Installation can be done with Bower, a JS package manager. There is also a standalone version available, but there are a few caveats:</p>
+
+        <ul>
+        <li>The standalone version does not have support for module loading systems, such as requireJS. It instead instantiates global variables on the window object.</li>
+        <li>The standalone version does not manage dependencies for you; you will need to download and configure access to your Flight&#39;s dependencies yourself.</li>
+        </ul>
+
+        <p>Overall, it is recommended that you install Flight either by using Bower or by using Yeoman to scaffold your project for you. Both of these installation methods are detailed in this tutorial.</p>
+
+        <h2>Installation via Bower</h2>
+
+        <h4>Installing Bower</h4>
+
+        <p>If you haven&#39;t yet, install Node.JS, which will install npm.</p>
+
+        <p>Then run the following command:</p>
+
+        <pre>
+        <code>
+        $ npm install -g bower
+        </code>
+        </pre>
+
+        <h4>Installing Flight</h4>
+
+        <p><code>cd</code> into your project directory. Then run the following:</p>
+
+        <pre>
+        <code>
+        $ bower install flight
+        </code>
+        </pre>
+
+        <p>This will not only install Flight, but all of Flight&#39;s dependencies, into a <code>bower_components</code> folder in your project&#39;s directory.</p>
+
+        <h2>Installation via Yeoman and flight-generator</h2>
+
+        <h4>Installing Yeoman</h4>
+
+        <p>If Yeoman isn&#39;t already installed, run the following:</p>
+
+        <pre>
+        <code>
+        $ npm install -g yo
+        </code>
+        </pre>
+
+        <h4>Installing generator-flight</h4>
+
+        <p>The way Yeoman works is it uses a generator, which contains a template for a project. These generators are installed via npm. The generator we&#39;ll be using is provided by the flight maintainers, and it is called generator-flight. In order to install generator-flight, run the following:</p>
+
+        <pre>
+        <code>
+        $ npm install -g generator-flight
+        </code>
+        </pre>
+
+        <h4>Running the Flight Yeoman Generator</h4>
+
+        <p><strong>NOTE:</strong> Be aware that if your project folder is not empty when you run Yeoman with the Flight generator, it could cause issues or errors with your project&#39;s scaffolding. This method should be used with an empty project directory.</p>
+
+        <p>In your project directory, run the following:</p>
+
+        <pre>
+        <code>
+        $ yo flight
+        </code>
+        </pre>
+
+        <p>Yeoman will ask you a series of questions, including whether to include Bootstrap, Bootstrap Theme, and a Google Analytics snippet. Answer these questions and Yeoman will get to work scaffolding an app for you.</p>
+
+        <h2>Writing a Component</h2>
+
+        <p>A Flight component consists of a few simple parts:</p>
+
+        <ul>
+        <li>Default Attributes</li>
+        <li>Initialization</li>
+        <li>Event Handlers</li>
+        <li>Component Methods</li>
+        </ul>
+
+        <h3>Basic Scaffolding for a Component</h3>
+
+        <p>This is the basic skeleton of a component before the parts are added:</p>
+
+        <pre><code>define(require){
+            //pull in the Flight module that encapsulates your code into a component
+            var createComponent(&#39;bower_components/flight/lib/component&#39;);
+
+            function myComponent(){
+                //this will be reference as the &#39;component function&#39; from here on out.
+            }
+
+            return createComponent(myComponent);
+        }
+        </code></pre>
+
+        <p>This creates an AMD module containing a Flight component. </p>
+
+        <h3>Default Attributes</h3>
+
+        <p>Calling <code>this.DefaultAttrs({});</code> within a component function, you can set default attributes for your component. Flight offers some functionality with these attributes, especially if they are jquery selectors. </p>
+
+        <p>What should go in <code>defaultAttrs()</code>? At the very least, your node&#39;s child selectors. For example, if you&#39;re wrapping the following html in a Flight component:</p>
+
+        <pre><code>&lt;form class=&quot;myForm&quot;&gt;
+            &lt;div class=&quot;success-message&quot;&gt;&lt;/div&gt;
+            &lt;label for=&quot;my-name&quot;&gt;My Name:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; name=&quot;my-name&quot; placeholder=&quot;Jane Doe&quot; /&gt;
+            &lt;label form=&quot;my-email&quot;&gt;My Email:&lt;/label&gt;
+            &lt;input type=&quot;text&quot; name=&quot;my-email&quot; placeholder=&quot;jdoe@gmail.com&quot; /&gt;
+            &lt;input type=&quot;submit&quot; value=&quot;Submit&quot; /&gt;
+        &lt;/form&gt;
+        </code></pre>
+
+        <p>Your <code>defaultAttrs()</code> will look like this:</p>
+
+        <pre><code>this.defaultAttrs({
+            &quot;successMessage&quot;: &quot;.success-message&quot;,
+            &quot;myName&quot;: &quot;input[name=my-name]&quot;,
+            &quot;myEmail&quot;: &quot;input[name=my-email]&quot; 
+        });
+        </code></pre>
+
+        <p>This allows us to utilize several functions that are given to us by the framework. </p>
+
+        <p>If you wish to override these defaults for a specific instance, you can do so when you attach the component (covered in Using a Component).</p>
+
+        <h3>Initialization</h3>
+
+        <p>The initialization of a component is where you handle any setup for your component instance, including your event listeners.</p>
+
+        <p>To set up your initialization, add this to your component function:</p>
+
+        <pre><code>this.after(&#39;initialization&#39;, function(){
+            //the this variable references the component instance
+        });
+        </code></pre>
+
+        <p>In this initialization handler, we&#39;ll set up our event listeners for our component, using the given method:</p>
+
+        <pre><code>this.on(selector, &#39;event&#39;, handler);
+        </code></pre>
+
+        <p>Your handler should be <code>this.</code> <em>something</em>. This gives you access to the component instance via this <code>this</code> variable.</p>
+
+        <h3>Event Handlers/Component Methods</h3>
+
+        <p>These handle the bulk of the work for your component. They are built on top of the <code>this</code> variable in your component function</p>
+
+        <pre><code>this.onEvent = function(event, data){
+            //your component logic
+
+            this.trigger(selector, eventType, data);
+        };
+        </code></pre>
+
+        <p>The difference between component functions and event handlers is that the component functions aren&#39;t called by listeners. But they still have access to functions available to components if they are attached the the <code>this</code> variable.</p>
+
+        <h2>Using a Component</h2>
+
+        <p>Once you have set up your component, you get it running by attaching it to an html fixture on the page. In your main JS file, you&#39;ll pull it in using require, and then call <code>.attachTo()</code> on it.</p>
+
+        <pre><code>require([
+            &#39;myComponent&#39;
+        ],
+        function(
+            myComponent
+        ){
+            myComponent.attachTo(selector);
+        });
+        </code></pre>
+
+        <p>If you wish to override your default attributes, this would be the time to do it. You can pass a second argument object to do so:</p>
+
+        <pre><code>myComponent.attachTo({
+            &quot;successMessage&quot;: &quot;.my-other-success-message&quot;
+        });
+        </code></pre>
+    </div>
+    </div>
+
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+  </body>
+</html>
