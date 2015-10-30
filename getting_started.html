@@ -1,0 +1,263 @@
+<!DOCTYPE>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="format" content="complete">
+</head>
+<body>
+
+<h1>Getting Started With Twitter Flight</h1>
+
+<p>In order to get started with Flight, we&#8217;re going to build a small example application. This application will contain a counter, with three buttons: an Add, Subtract, and a Reset button. These buttons will increment, decrement, and reset the counter to zero.</p>
+
+<h2>Prerequisites</h2>
+
+<p>We&#8217;re going to use the Yeoman generator to generate our files and application structure. In order to do this, you&#8217;ll need to have Node installed. If Yeoman isn&#8217;t already installed:</p>
+
+<pre><code>npm install -g yo
+</code></pre>
+
+<p>Once Yeoman is installed, run:</p>
+
+<pre><code>npm install -g generator-flight
+</code></pre>
+
+<p>to install the Flight generators for Yeoman.</p>
+
+<h2>Installation</h2>
+
+<p>Instead of installing Flight ourselves via Bower, we&#8217;re going to let Yeoman set up our application scaffolding, which includes setting up dependencies. Once Yeoman and the Flight Generator are installed, run the following:</p>
+
+<pre><code>yo flight
+</code></pre>
+
+<p>In order to start the generator. You will be asked a few yes/no questions about including bootstrap and analytics. Then it should run for a bit - installing bower components, npm modules, etc.</p>
+
+<p>In the example code below, the generator was run and included bootstrap 3 and the bootstrap theme.</p>
+
+<p>Once it finishes, you&#8217;ll have a full application folder structure at your disposal. In the root folder for your project, you&#8217;ll find plenty of README-style files, with markdown extensions. There are also config files for Bower, npm, gulp, and Karma. The test and app folders are where we will be spending most of our coding time.</p>
+
+<p>But first, let&#8217;s get the build system for our app set up- the Yeoman generator for Flight apps sets up a gulp config file for you.</p>
+
+<h2>The Build System</h2>
+
+<p>Before we write some code, we should get the build system running and watching our application files to refresh on change. Luckily, the npm configuration file provided by the generator allows us to do this without any extra modification. Just run the following command in the root directory of your project:</p>
+
+<pre><code>npm run watch
+</code></pre>
+
+<p>This will set up a static server at <code>localhost:8080</code>, and LiveReload and a watch task are started; this way, when we make a change to any <code>.js</code> or <code>.css</code> file, it will automatically reload in the browser.</p>
+
+<h2>Basic App setup</h2>
+
+<p>First, we&#8217;ll add the following to the generated <code>app/index.html</code> file, in the <code>&lt;body&gt;</code>:</p>
+
+<pre><code>&lt;div class=&quot;js-counter&quot;&gt;
+    &lt;p&gt;Count:&lt;span class=&quot;js-count&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;a href=&quot;&quot; class=&quot;btn btn-success js-increment&quot;&gt;+&lt;/a&gt;
+    &lt;a href=&quot;&quot; class=&quot;btn btn-danger js-decrement&quot;&gt;-&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>This will serve as our html fixture for our counter component. It&#8217;ll render to look like this in the browser:</p>
+
+<img src="./img/render1.png" alt="Our counter fixture" title="Our counter fixture" />
+
+
+<p>So now that our html is set up, we&#8217;ll get our main JS file started. This has been generated for us at <code>app/js/main.js</code>. Looking at this file, it already pulls in flight for us, and the scaffolding is already neatly set up, allowing us to dive right into writing our first component.</p>
+
+<h2>Writing a Component</h2>
+
+<p>We&#8217;re going to use the Yeoman generator to scaffold out our counter component. Using the command line, run the following <strong>from the root of your project</strong>:</p>
+
+<pre><code>yo flight:component counter
+</code></pre>
+
+<p>This will create two files: a component file in <code>app/js/component</code>, and a test spec file in <code>test/spec/component</code>. </p>
+
+<p>Next, we&#8217;ll add our functionality to <code>app/js/component/counter.js</code>. First, edit the <code>this.defaultAttrs()</code> call:</p>
+
+<pre><code>this.defaultAttrs({
+    'counterDisplay': '.js-count',
+    'incrementButton': '.js-increment',
+    'decrementButton': '.js-decrement'
+});
+</code></pre>
+
+<p>This gives us access to our html through the <code>this.select()</code> function within the component. Next, we&#8217;ll add to the <code>this.after('initialize')</code> call to set up our event handlers:</p>
+
+<pre><code>this.after('initialize', function () {
+    this.on('click': {
+        'incrementButton': this.increment,
+        'decrementButton': this.decrement
+    });
+});
+</code></pre>
+
+<p>Now that our event listeners are set up, let&#8217;s set up our event handlers. Below the <code>this.after('initialize')</code> call, add the following functions:</p>
+
+<pre><code>this.increment = function(event){
+    event.preventDefault();
+
+    var $display = this.select('counterDisplay'),
+        currentValue = $display.text() - 0;
+
+    this.trigger('counterChange', {
+        value: currentValue + 1
+    });
+};
+
+this.decrement = function(event){
+    event.preventDefault();
+
+    var $display = this.select('counterDisplay'),
+        currentValue = $display.text() - 0;
+
+    this.trigger('counterChange', {
+        value: currentValue - 1
+    });
+};
+
+this.change = function(event, data){
+    this.select('counterDisplay').text(data.value);
+};
+</code></pre>
+
+<p>Okay, we have code. Finally, we have to tell our <code>app/js/main.js</code> file to require and attach the component. Modify the <code>require()</code> call to look like the following:</p>
+
+<pre><code>require(
+    [
+        'component/counter'
+    ],
+
+    function(counter) {
+        counter.attachTo('.js-counter');
+    }
+);
+</code></pre>
+
+<p>Now that we have the code, try it in your browser. Your counter should start at 0 and respond appropriately to both buttons. So let&#8217;s write some tests to check for sure that this happens.</p>
+
+<h2>Writing tests for a Component</h2>
+
+<p>Yeoman sets us up with karma, which will run flight-jasmine tests in a headless PhantomJS instance. Your test file was created at <code>tests/spec/component/counter.spec.js</code> when we generated our component, so let&#8217;s take a look at that file. In it is a basic definition test. We&#8217;re going to add a test that will check that clicking the increment and decrement buttons fires a <code>counterChange</code> event with the right values. </p>
+
+<p>First, we&#8217;ll want to give the <code>setupComponent()</code> call our HTML fixture so it can run the tests. We can remove the bootstrap styling classes, leaving us with:</p>
+
+<pre><code>setupComponent('&lt;div class=&quot;js-counter&quot;&gt;&lt;div class=&quot;js-count&quot;&gt;&lt;/div&gt;&lt;div class=&quot;js-increment&quot;&gt;&lt;/div&gt;&lt;div class=&quot;js-decrement&quot;&gt;&lt;/div&gt;&lt;/div&gt;');
+</code></pre>
+
+<p>Next we&#8217;ll want to add our own tests. You can remove the line that has the following text: </p>
+
+<p>it(&#8216;should do something&#8217;);</p>
+
+<p>As that&#8217;s just a placeholder. Add the following in its place:</p>
+
+<pre><code>it('should fire a counterChange with 1 when the increment button is clicked', function(){
+    //creates a spy for the 'counterChange' function
+    var eventSpy = spyOnEvent(document, 'counterChange');
+    //clicks the increment button
+    this.component.select('incrementButton').click();
+    //checks that the counterChange event made it up the DOM
+    expect(eventSpy).toHaveBeenTriggeredOn(document);
+    //checks the data sent with the counterChange event
+    expect(eventSpy.mostRecentCall.data).toEqual({
+        value: 1
+    });
+});
+</code></pre>
+
+<p>Save the <code>counter.spec.js</code> file. In the root of your project, run the following:</p>
+
+<pre><code>npm run test
+</code></pre>
+
+<p>You should end up with a result similar to the screenshot below:</p>
+
+<img src="./img/screenshot1.png" alt="Test Results Screenshot" title="Test Results Screenshot" />
+
+
+<p>Now, let&#8217;s add the decrement test, which will look eerily similar:</p>
+
+<pre><code>it('should fire a counterChange with -1 when the decrement button is clicked', function(){
+    var eventSpy = spyOnEvent(document, 'counterChange');
+
+    this.component.select('decrementButton').click();
+
+    expect(eventSpy).toHaveBeenTriggeredOn(document);
+
+    expect(eventSpy.mostRecentCall.data).toEqual({
+        value: -1
+    });
+});
+</code></pre>
+
+<p>Re-run the tests and make sure all 3 pass. </p>
+
+<h2>Writing and Using a Mixin</h2>
+
+<p>You may have noticed that there&#8217;s a similar piece of functionality between the increment and decrement buttons- we need to get the numerical value of the counter text. We&#8217;re going to pull this functionality into a mixin, and use that with our counter component.</p>
+
+<p>To start, we&#8217;ll use the Yeoman generator to create our mixin file. From the root of your project, run the following:</p>
+
+<pre><code>yo flight:mixin numberText
+</code></pre>
+
+<p>The generator will create the files <code>app/js/component/with_numberText.js</code> and <code>tests/spec/component/with_numberText.spec.js</code> (Note the prefix of with_). In this file, we&#8217;re just going to ignore the <code>this.defaultAttrs()</code> and the <code>this.after('initialize')</code> calls. Instead, we&#8217;re just going to add the following: </p>
+
+<pre><code>this.getNumberValue = function(selector){
+  return this.select(selector).text() - 0;
+}
+</code></pre>
+
+<p>We now have our functionality pulled out. Now we just need to modify our <code>app/js/component/counter.js</code> file. First, we&#8217;ll tell the component to require in the mixin (under the section labeled &#8216;Module Dependencies&#8217;):</p>
+
+<pre><code>var withNumberText = require('component/with_numberText');
+</code></pre>
+
+<p>Next, we&#8217;ll modify the <code>defineComponent()</code> call to add in the mixin:</p>
+
+<pre><code>return defineComponent(counter, withNumberText);
+</code></pre>
+
+<p>And finally, we&#8217;ll modify out increment and decrement handlers to use the mixin functions:</p>
+
+<pre><code>this.increment = function(event){
+    event.preventDefault();
+
+    //this is where the new mixin function gets used
+    var currentValue = this.getNumberValue('counterDisplay');
+
+    this.trigger('counterChange', {
+        value: currentValue + 1
+    });
+};
+
+this.decrement = function(event){
+    event.preventDefault();
+
+    //this is where the new mixin function gets used
+    var currentValue = this.getNumberValue('counterDisplay');
+
+    this.trigger('counterChange', {
+        value: currentValue - 1
+    });
+};
+</code></pre>
+
+<p>Now, from the root of your project, run <code>npm run test</code>. The tests should still pass. Go ahead and test in your browser, too.</p>
+
+<h2>Conclusion</h2>
+
+<p>We&#8217;ve now written a small app with a component, tests, and a mixin! Some things you can try next: </p>
+
+<ul>
+<li>Copy your HTML fixture in your <code>app/index.html</code> and see if multiple counters work on one page (hint: it should!)</li>
+<li>Create a incrementAll and decrementAll button that will increment and decrement all counters on the page.</li>
+<li>Write even more tests!</li>
+</ul>
+
+<p>Hopefully this tutorial has you well on your way to writing apps with Flight!</p>
+
+</body>
+</html>
